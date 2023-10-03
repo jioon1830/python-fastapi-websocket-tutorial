@@ -43,7 +43,7 @@
                     var content = document.createTextNode(text.from + ': ' + text.msg)
                     message.appendChild(content)
                     document.getElementById('messages').appendChild(message)
-                };
+                }
                 ws.onclose = function(event) {
                     var message = document.createElement('li')
                     var content = document.createTextNode(`Disconnected: ${event.reason}`)

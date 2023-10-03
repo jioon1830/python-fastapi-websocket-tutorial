@@ -23,15 +23,19 @@ async def websocket(user: str, websocket: WebSocket):
     ######### [ TODO ] #########
     # TODO Join the chat
     ############################
-
+    await chat.join(user, websocket)
     try:
         while True:
             ######### [ TODO ] #########
             # TODO Receive message from the user and handle
             ############################
-            pass
+            data = await websocket.receive_json()
+            await chat.handle_message(user, data)
+
     except WebSocketDisconnect:
         ######### [ TODO ] #########
         # TODO Handle disconnection: leave the chat
         ############################
-        pass
+        await chat.leave(user)
+        return
+
