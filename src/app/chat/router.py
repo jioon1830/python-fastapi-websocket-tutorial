@@ -9,7 +9,6 @@ router = APIRouter(prefix="/chat", tags=['chat'])
 with open('assets/index.html', 'r') as f:
     html = f.read()
 
-
 @router.get("/")
 async def get() -> HTMLResponse:
     """Loads the web page."""

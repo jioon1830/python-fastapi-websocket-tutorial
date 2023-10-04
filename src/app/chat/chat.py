@@ -23,14 +23,8 @@ class Chat:
         # TODO Close connection on duplicate and exit method.
         ############################
 
-        if user == "system":
-            close_reason = (f"User {user} already exists")
-            await websocket.close(reason=close_reason)
-
-        for member, member_ws in self.members.items():
-            if user == member:
-                await websocket.close(reason = f"User {user} already exists")
-
+        if user == "system" or user in self.members.keys():
+            await websocket.close(reason=f"User {user} already exists")
 
 
         ######### [ TODO ] #########
@@ -86,28 +80,30 @@ class Chat:
             "from": f"{user}",
             "msg": f"{msg}"
         }
+        error_message = {
+            "from": "system",
+            "msg": f"User {receiver} does not exist"
+        }
         if message_type == "broadcast":
             tasks = []
             for member, member_ws in self.members.items():
-                task = asyncio.create_task(member_ws.send_json(message_from_server))
-                tasks.append(task)
+                if member != user :
+                    task = asyncio.create_task(member_ws.send_json(message_from_server))
+                    tasks.append(task)
             for task in tasks:
                 await task
         if message_type == "direct":
             toWebsocket = self.members.get(receiver, 0)
             if toWebsocket != 0:
                 await toWebsocket.send_json(message_from_server)
-
+            if self.members.get(receiver, 0) == 0:
+                websocket = self.members.get(user)
+                await websocket.send_json(error_message)
 
         ######### [ TODO ] #########
         # TODO Otherwise, forward the message to the receiver.
         # If broadcasting the message, DO NOT send to the original sender.
         ############################
-        error_message = {
-            "from": "system",
-            "msg": f"User {receiver} does not exist"
-        }
-        if self.members.get(receiver, 0)==0:
-            websocket = self.members.get(user)
-            await websocket.send_json(error_message)
+
+
 
